@@ -1,0 +1,11 @@
+{
+  "dataset_name": "Modular Addition Synthetic Dataset",
+  "prime_modulus": 97,
+  "total_samples": 9409,
+  "features": "One-hot encoded vector of size 194 (a and b concatenated)",
+  "labels": "Integer scalar representing (a + b) mod 97",
+  "train_split_ratio": 0.5,
+  "generation_method": "Algorithmic exhaustive enumeration of all pairs (a, b) where a, b in [0, p-1]",
+  "noise_injection": "None for standard training; uniform random permutations for negative control tests",
+  "license": "MIT Open Source"
+}
