@@ -5,7 +5,7 @@ import torch.optim as optim
 import random
 import os
 
-# 1. Завантаження конфігурації (аналог appsettings.json)
+# 1. Configuration Loading
 with open("config.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
@@ -17,16 +17,16 @@ LR = config["model"]["learning_rate"]
 WD = config["model"]["weight_decay"]
 EPOCHS = config["model"]["max_epochs"]
 
-# Фіксуємо seed для відтворюваності (Крок протоколу щодо контролю пайплайна)
+# Fix seed for reproducibility (Pipeline control protocol step)
 random.seed(SEED)
 torch.manual_seed(SEED)
 
-# 2. Генерація датасету (Усі пари a, b для модульного додавання)
+# 2. Dataset Generation (Exhaustive enumeration for modular addition)
 def generate_data(p):
     X, Y = [], []
     for a in range(p):
         for b in range(p):
-            # One-hot кодування для a та b
+            # One-hot encoding for a and b
             x = torch.zeros(2 * p)
             x[a] = 1.0
             x[p + b] = 1.0
@@ -35,10 +35,10 @@ def generate_data(p):
             Y.append(y)
     return torch.stack(X), torch.tensor(Y, dtype=torch.long)
 
-print(f"Генеруємо дані для p={P}...")
+print(f"Generating data for prime modulus p={P}...")
 X_all, Y_all = generate_data(P)
 
-# Розбиття на Train / Test
+# Train / Test Split
 indices = list(range(len(X_all)))
 random.shuffle(indices)
 split_idx = int(len(indices) * TRAIN_RATIO)
@@ -47,7 +47,7 @@ train_idx, test_idx = indices[:split_idx], indices[split_idx:]
 X_train, Y_train = X_all[train_idx], Y_all[train_idx]
 X_test, Y_test = X_all[test_idx], Y_all[test_idx]
 
-# 3. Архітектура моделі (Мінімальний MLP)
+# 3. Model Architecture (Minimal MLP)
 class ModularMLP(nn.Module):
     def __init__(self, p, hidden_dim):
         super().__init__()
@@ -58,17 +58,20 @@ class ModularMLP(nn.Module):
     def forward(self, x):
         hidden = self.relu(self.layer1(x))
         out = self.layer2(hidden)
-        return out, hidden # Повертаємо hidden для майбутнього аналізу інваріантів
+        return out, hidden # Return hidden state for invariant analysis
 
 model = ModularMLP(P, HIDDEN_DIM)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=WD)
 
-# 4. Основний цикл навчання (Пошук Grokking)
-print("Починаємо навчання. Шукаємо розрив між запам'ятовуванням та узагальненням...")
+# 4. Main Training Loop (Search for Grokking phase transition)
+print("Starting training. Searching for the gap between memorization and generalization...")
 
-# Папки для збереження станів (щоб потім перевірити інваріанти)
+# Directory for saving states (to verify invariants later)
 os.makedirs("checkpoints", exist_ok=True)
+
+# Flags to prevent continuous overwriting
+memorization_captured = False
 
 for epoch in range(1, EPOCHS + 1):
     model.train()
@@ -88,14 +91,17 @@ for epoch in range(1, EPOCHS + 1):
             acc_train = (out_train.argmax(dim=1) == Y_train).float().mean().item()
             acc_test = (out_test.argmax(dim=1) == Y_test).float().mean().item()
             
-        print(f"Епоха {epoch:04d} | Train Acc: {acc_train:.4f} | Test Acc: {acc_test:.4f}")
+        print(f"Epoch {epoch:04d} | Train Acc: {acc_train:.4f} | Test Acc: {acc_test:.4f}")
         
-        # Зберігаємо "зрізи" на ключових етапах для compute_invariants.py
-        if acc_train > 0.99 and acc_test < 0.2:
+        # Save diagnostic slices at critical epistemic stages
+        if acc_train > 0.99 and acc_test < 0.2 and not memorization_captured:
             torch.save(hidden_test, "checkpoints/hidden_memorization.pt")
+            print("--- Memorization state captured ---")
+            memorization_captured = True
+            
         if acc_train > 0.99 and acc_test > 0.95:
             torch.save(hidden_test, "checkpoints/hidden_generalization.pt")
-            print("🔥 Grokking зафіксовано! Тестова точність стрибнула.")
+            print("🔥 Grokking captured! Test accuracy jump detected.")
             break
 
-print("Навчання завершено. Переходимо до перевірки інваріантів.")
+print("Training complete. Proceeding to invariant verification.")
