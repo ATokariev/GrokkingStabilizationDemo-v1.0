@@ -1,19 +1,19 @@
-# Пререєстрація експерименту: Фазовий перехід та геометрія латентного простору при Grokking
+# Experiment Pre-registration: Phase Transition and Latent Space Geometry during Grokking
 
-## 1. Гіпотеза
-Феномен grokking у нейронних мережах при навчанні на задачах модульної арифметики супроводжується структурним фазовим переходом у латентному просторі. Перехід від стану «сліпого запам'ятовування» до стану «узагальнення» не є простою плавчною оптимізацією, а являє собою зміну геометричної сингулярності, що виявляється через різке падіння міжканальної подібності (CKA).
+## 1. Hypothesis
+The phenomenon of grokking in neural networks trained on modular arithmetic tasks is accompanied by a structural phase transition in the latent space. The transition from a state of "blind memorization" to a state of "generalization" is not a simple smooth optimization process, but constitutes a change in geometric singularity, manifested through a sharp drop in cross-channel similarity (CKA).
 
-## 2. Канали та Діагностичні зрізи
-- **Канал вимірювання:** Активації прихованого шару (hidden representations) моделі `ModularMLP`.
-- **Метрика (η-проксі):** Лінійний Centered Kernel Alignment (CKA) між станом запам'ятовування та станом узагальнення.
-- **Поріг рішення:** CKA-подібність нижче 0.85 вважається дефектом узгодженості (інваріант не зберігається).
+## 2. Channels and Diagnostic Slices
+- **Measurement Channel:** Hidden layer activations (hidden representations) of the `ModularMLP` model.
+- **Metric (η-proxy):** Linear Centered Kernel Alignment (CKA) between the memorization state and the generalization state.
+- **Decision Threshold:** A CKA similarity below 0.85 is considered a consistency defect (the invariant is not preserved).
 
-## 3. Негативні тести та нульова модель
-- **Негативний контроль:** Навчання моделі на цільових мітках, замінених на білий шум (Uniform random integers).
-- **Критерій провалу негативного тесту:** Латентна структура шумової моделі повинна демонструвати колапс подібності до еталонного інваріанта (CKA < 0.15).
+## 3. Negative Tests and Null Model
+- **Negative Control:** Training the model with target labels replaced by white noise (uniform random integers).
+- **Negative Test Failure Criterion:** The latent structure of the noise model must demonstrate a similarity collapse relative to the reference invariant (CKA < 0.15).
 
-## 4. Резервні пояснення
-Якщо CKA-подібність між станами висока при низькій тестовій точності, або якщо негативний тест не призводить до колапсу структури, кандидатна інтерпретація відхиляється як артефакт архітектури, а не як справжній алгоритмічний інваріант.
+## 4. Fallback Explanations
+If the CKA similarity between states remains high despite low test accuracy, or if the negative test does not result in a structural collapse, the candidate interpretation is rejected as an architectural artifact rather than a genuine algorithmic invariant.
 
-*Дата реєстрації:* 2026-07-24  
-*Статус версії:* Незмінна (Immutable)
+*Registration Date:* 2026-07-24  
+*Version Status:* Immutable
