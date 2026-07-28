@@ -1,4 +1,4 @@
-# Демонстраційна модель: Grokking у модульному додаванні
+# Demonstration Model: Grokking in Modular Addition
 experiment:
   task: "modular_addition"
   prime_modulus: 97
@@ -8,19 +8,19 @@ experiment:
 model:
   architecture: "mlp"
   hidden_dim: 128
-  weight_decay: 1.0 # Високий weight decay сприяє grokking
+  weight_decay: 1.0 # High weight decay facilitates grokking
   learning_rate: 0.001
   max_epochs: 10000
 
 protocol:
-  # Крок 2: Кандидатний інваріант
-  invariant_metric: "CKA_similarity" # Centered Kernel Alignment для латентних шарів
+  # Step 2: Candidate Invariant
+  invariant_metric: "CKA_similarity" # Centered Kernel Alignment for latent layers
   
-  # Крок 4: Перехідне правило (поріг для η-проксі)
-  eta_proxy_threshold: 0.85 # Якщо CKA > 0.85, вважаємо структуру стабілізованою
-  accuracy_threshold: 0.95  # Поведінковий поріг
+  # Step 4: Transition Rule (Threshold for the η-proxy)
+  eta_proxy_threshold: 0.85 # If CKA > 0.85, the structure is considered stabilized
+  accuracy_threshold: 0.95  # Behavioral threshold
 
-  # Крок 5: Негативні тести
+  # Step 5: Negative Tests
   negative_tests:
     label_permutation: true
     seed_ablation: true
