@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import random
 
-# 1. Завантажуємо конфігурацію
+# 1. Load configuration
 with open("config.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
@@ -13,7 +13,7 @@ HIDDEN_DIM = config["model"]["hidden_dim"]
 LR = config["model"]["learning_rate"]
 WD = config["model"]["weight_decay"]
 
-# 2. Генерація даних із ЗІПСОВАНИМИ мітками (Негативний контроль)
+# 2. Dataset Generation with Corrupted Labels (Negative Control)
 def generate_corrupted_data(p):
     X, Y = [], []
     for a in range(p):
@@ -21,13 +21,13 @@ def generate_corrupted_data(p):
             x = torch.zeros(2 * p)
             x[a] = 1.0
             x[p + b] = 1.0
-            # Рандомна мітка замість правильної відповіді
+            # Random label instead of the correct target answer
             y = random.randint(0, p - 1)
             X.append(x)
             Y.append(y)
     return torch.stack(X), torch.tensor(Y, dtype=torch.long)
 
-print("--- Запуск Негативного Тесту: Навчання на хаотичних мітках ---")
+print("--- Running Negative Test: Training on Chaotic Labels ---")
 X_train, Y_train = generate_corrupted_data(P)
 
 model = nn.Sequential(
@@ -38,7 +38,7 @@ model = nn.Sequential(
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=WD)
 
-print("Змушуємо модель запам'ятати шум...")
+print("Forcing the model to memorize noise...")
 for epoch in range(1, 1501):
     model.train()
     optimizer.zero_grad()
@@ -49,18 +49,19 @@ for epoch in range(1, 1501):
     
     if epoch % 500 == 0:
         acc = (out.argmax(dim=1) == Y_train).float().mean().item()
-        print(f"Епоха {epoch:04d} | Train Acc (Шум): {acc:.4f}")
+        print(f"Epoch {epoch:04d} | Train Acc (Noise): {acc:.4f}")
 
-# Отримуємо латентний простір негативного тесту
+# Extract the latent space of the negative test model
 with torch.no_grad():
     hidden_negative = model[1](model[0](X_train))
 
-# 3. Порівняння з еталонним інваріантом (з етапу справжнього grokking)
+# 3. Comparison with the Reference Invariant (from the true grokking stage)
 true_gen_path = "checkpoints/hidden_generalization.pt"
+
 try:
     hidden_true = torch.load(true_gen_path)
 except FileNotFoundError:
-    print("Не знайдено еталонного файлу узагальнення. Запустіть train.py ще раз.")
+    print("Reference generalization state not found. Please run train.py first.")
     exit()
 
 def linear_cka(X, Y):
@@ -71,16 +72,16 @@ def linear_cka(X, Y):
     norm_y = torch.norm(Y_c.t() @ Y_c)
     return (dot_product / (norm_x * norm_y)).item()
 
-# Вирівнюємо розмірності для порівняння
+# Align dimensions for comparison
 min_size = min(hidden_negative.shape[0], hidden_true.shape[0])
 cka_score = linear_cka(hidden_negative[:min_size], hidden_true[:min_size])
 
-print("\n--- Результат Негативного Тесту ---")
-print(f"Подібність хаотичної структури до еталонної (CKA): {cka_score:.4f}")
+print("\n--- Negative Test Results ---")
+print(f"Similarity of chaotic structure to the reference (CKA): {cka_score:.4f}")
 
 if cka_score < config["protocol"]["eta_proxy_threshold"]:
-    print("✅ ВЕРДИКТ ПРОТОКОЛУ: Негативний тест УСПІШНИЙ.")
-    print("Мережа здатна запам'ятати шум, але її латентна структура при цьому колапсує.")
-    print("Це математично доводить, що наш знайдений інваріант не є випадковим артефактом архітектури.")
+    print("✅ PROTOCOL VERDICT: Negative test SUCCESSFUL.")
+    print("The network is capable of memorizing noise, but its latent structure collapses in the process.")
+    print("This mathematically proves that our discovered invariant is not a random architectural artifact.")
 else:
-    print("❌ ВЕРДИКТ ПРОТОКОЛУ: Негативний тест ПРОВАЛЕНО.")
+    print("❌ PROTOCOL VERDICT: Negative test FAILED.")
