@@ -1,25 +1,30 @@
-Markdown# Grokking Stabilization Demo
+# Grokking Stabilization Demo
 
-Цей репозиторій містить мінімальний пакет відтворюваності (Proof-of-Concept) для демонстрації операційності рамки **Спектра стабілізації**. На прикладі задачі модульного додавання ($p = 97$) демонструється епістемічна фільтрація фазового переходу (grokking) та перевірка інваріантів за допомогою міжканальної узгодженості (CKA) і негативних тестів.
+This repository contains a minimal reproducibility package (Proof-of-Concept) to demonstrate the operability of the **Stabilization Spectrum** framework. Using the modular addition task ($p = 97$) as an example, it demonstrates the epistemic filtration of a phase transition (grokking) and the verification of invariants using cross-channel consistency (CKA) and negative tests.
 
-## Повний покроковий порядок відтворення
+## Full Step-by-Step Reproducibility Guide
 
-### Крок 1: Створення середовища та встановлення залежностей
-Відкрийте проєкт у Visual Studio або терміналі, створіть локальне віртуальне середовище Python та встановіть пакети з файлу залежностей:
-```bash pip install -r requirements.txt
+### Step 1: Environment Setup and Dependency Installation
+Open the project in Visual Studio or a terminal, create a local Python virtual environment, and install the packages from the dependencies file:
+
+```bash
+pip install -r requirements.txt
 ```
-### Крок 2: Навчання моделі та фіксація фазового переходу (train.py)
-Запустіть скрипт навчання, який згенерує дані для модульного додавання ($p = 97$), навчить нейромережу MLP та збереже контрольні точки (checkpoints) латентного простору для етапів запам'ятовування і узагальнення:
-```Bash python train.py
+### Step 2: Model Training and Phase Transition Capture (train.py)Run the training script, which will generate data for modular addition ($p = 97$), train an MLP neural network, and save latent space checkpoints for the memorization and generalization stages:
+```bash
+python train.py
 ```
-### Крок 3: Перевірка інваріантів та $\eta$-проксі (compute_invariants.py)
-Запустіть аналіз міжканальної узгодженості, щоб обчислити метрику CKA та перевірити дефект узгодженості відносно зареєстрованого порогу:
-```Bash python compute_invariants.py
+### Step 3: Verification of Invariants and the $\eta$-proxy (compute_invariants.py)Run the cross-channel consistency analysis to compute the CKA metric and verify the consistency defect against the registered threshold:
+```bash
+python compute_invariants.py
 ```
-### Крок 4: Запуск негативного контролю (run_negative_tests.py)
-Виконайте перевірку на зіпсованих (шумових) мітках для підтвердження того, що латентна геометрія колапсує при відсутності реальної структури даних:
-```Bash python run_negative_tests.py
+### Step 4: Execution of Negative Controls (run_negative_tests.py)
+Perform a check using corrupted (noisy) labels to confirm that the latent geometry collapses in the absence of a genuine data structure:
+```bash
+python run_negative_tests.py
 ```
-### (Додатково) 
-Для генерації візуального порівняння латентного простору за допомогою PCA виконайте:
-```Bash  python visualize_latent.py
+### (Optional)
+To generate a visual comparison of the latent space using PCA, run:
+```bash
+python visualize_latent.py
+```
