@@ -1,19 +1,61 @@
-# Experiment Pre-registration: Phase Transition and Latent Space Geometry during Grokking
+# Experiment Pre-registration:
+# Representation Reorganization during Grokking
 
 ## 1. Hypothesis
-The phenomenon of grokking in neural networks trained on modular arithmetic tasks is accompanied by a structural phase transition in the latent space. The transition from a state of "blind memorization" to a state of "generalization" is not a simple smooth optimization process, but constitutes a change in geometric singularity, manifested through a sharp drop in cross-channel similarity (CKA).
+
+Grokking in modular arithmetic neural networks is accompanied by a measurable
+reorganization of latent representations.
+
+This experiment tests whether a CKA-based representation compatibility
+observable changes between behaviorally identified memorization and
+generalization checkpoints under controlled conditions.
+
+The objective is to evaluate whether behavioral transition is associated with
+measurable changes in hidden-layer representation geometry.
+
+---
 
 ## 2. Channels and Diagnostic Slices
-- **Measurement Channel:** Hidden layer activations (hidden representations) of the `ModularMLP` model.
-- **Metric (η-proxy):** Linear Centered Kernel Alignment (CKA) between the memorization state and the generalization state.
-- **Decision Threshold:** A CKA similarity below 0.85 is considered a consistency defect (the invariant is not preserved).
 
-## 3. Negative Tests and Null Model
-- **Negative Control:** Training the model with target labels replaced by white noise (uniform random integers).
-- **Negative Test Failure Criterion:** The latent structure of the noise model must demonstrate a similarity collapse relative to the reference invariant (CKA < 0.15).
+Measurement Channel:
+
+Hidden layer activations.
+
+Representation Metric:
+
+Linear CKA used as a representation compatibility observable.
+
+Candidate Marker:
+
+A registered representation-compatibility criterion evaluated across predefined
+experimental variations.
+
+Decision Threshold:
+
+Thresholds are fixed before analysis.
+
+---
+
+## 3. Negative Tests
+
+Negative controls disrupt task structure while preserving the experimental
+pipeline.
+
+Failure criterion:
+
+The candidate representation marker should disappear under disrupted task
+structure.
+
+---
 
 ## 4. Fallback Explanations
-If the CKA similarity between states remains high despite low test accuracy, or if the negative test does not result in a structural collapse, the candidate interpretation is rejected as an architectural artifact rather than a genuine algorithmic invariant.
 
-*Registration Date:* 2026-07-24  
+Failure to satisfy the criterion indicates that the observed marker may be
+explained by optimization dynamics, architectural bias, or measurement artifacts
+rather than a task-dependent representation effect.
+
+---
+
+*Registration Date:* 2026-07-24
+
 *Version Status:* Immutable
