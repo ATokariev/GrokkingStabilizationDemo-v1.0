@@ -1,29 +1,77 @@
 # Demonstration Model: Grokking in Modular Addition
+
 experiment:
   task: "modular_addition"
   prime_modulus: 97
   train_split_ratio: 0.5
   random_seed: 42
 
+
 model:
   architecture: "mlp"
   hidden_dim: 128
-  weight_decay: 1.0 # High weight decay facilitates grokking
+
+  # Weight decay supports grokking-like phase transitions
+  weight_decay: 1.0
+
   learning_rate: 0.001
   max_epochs: 10000
 
-protocol:
-  # Step 2: Candidate Invariant
-  invariant_metric: "CKA_similarity" # Centered Kernel Alignment for latent layers
-  
-  # Step 4: Transition Rule (Threshold for the η-proxy)
-  eta_proxy_threshold: 0.85 # If CKA > 0.85, the structure is considered stabilized
-  accuracy_threshold: 0.95  # Behavioral threshold
 
-  # Step 5: Negative Tests
-  negative_tests:
+
+protocol:
+
+  # --------------------------------------------------------
+  # Representation-level observation
+  # --------------------------------------------------------
+
+  representation_metric: "linear_CKA"
+
+
+  # --------------------------------------------------------
+  # Candidate structural marker criterion
+  # --------------------------------------------------------
+
+  representation_consistency_threshold: 0.85
+
+
+  # --------------------------------------------------------
+  # Behavioral regime identification
+  # --------------------------------------------------------
+
+  generalization_accuracy_threshold: 0.95
+
+
+  # --------------------------------------------------------
+  # Admissible experimental transformations
+  # --------------------------------------------------------
+
+  admissible_transformations:
+
+    seed_variation: true
+
+    data_split_variation: true
+
+    optimizer_variation: false
+
+
+
+  # --------------------------------------------------------
+  # Negative controls
+  # --------------------------------------------------------
+
+  negative_controls:
+
     label_permutation: true
+
     seed_ablation: true
 
+
+
 reporting:
-  statuses: ["rejected", "indeterminate", "candidate_retained"]
+
+  statuses:
+
+    - rejected
+    - indeterminate
+    - candidate_retained
